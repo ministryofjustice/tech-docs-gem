@@ -36,7 +36,7 @@ jobs:
 
   deploy:
     name: Publish Ruby Gem
-    environment: rubygems
+    environment: github-package-registry
     permissions:
       contents: write  # needed to be able to tag the release
       packages: write  # needed to be able to publish the gem
