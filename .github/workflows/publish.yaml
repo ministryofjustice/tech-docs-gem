@@ -9,14 +9,20 @@ on:
 concurrency: rubygems
 
 jobs:
-  pre:
-    name: Pre-flight checks
+  deploy:
+    name: Publish Ruby Gem
     runs-on: ubuntu-latest
-    outputs:
-      go: ${{ steps.gem_version.outputs.new_version }}
-
+    permissions:
+      contents: write  # needed to be able to tag the release
+      packages: write  # needed to be able to publish the gem
+    environment: github-package-registry
     steps:
       - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          cache: 'npm'
+          node-version: '14'
 
       - uses: ruby/setup-ruby@v1
 
@@ -34,29 +40,8 @@ jobs:
             echo "name=new_version::true" >> ${GITHUB_OUTPUT}
           fi
 
-  deploy:
-    name: Publish Ruby Gem
-    environment: github-package-registry
-    permissions:
-      contents: write  # needed to be able to tag the release
-      packages: write  # needed to be able to publish the gem
-    runs-on: ubuntu-latest
-    needs: pre
-    if: ${{ needs.pre.outputs.go == 'true' }}
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions/setup-node@v3
-        with:
-          cache: 'npm'
-          node-version: '14'
-
-      - uses: ruby/setup-ruby@v1
-        with:
-          bundler-cache: true
-
       - name: Publish
+        if: ${{ steps.gem_version.outputs.new_version == 'true' }}
         uses: dawidd6/action-publish-gem@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
