@@ -16,22 +16,22 @@ jobs:
       go: ${{ steps.gem_version.outputs.new_version }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: ruby/setup-ruby@v1
 
       - name: Check if new version to release
         id: gem_version
         run: |
-          gem_version=$(ruby -r rubygems -e "puts Gem::Specification::load('govuk_tech_docs.gemspec').version")
-          echo "::set-output name=gem_version::$gem_version"
+          gem_version=$( ruby -r rubygems -e "puts Gem::Specification::load('govuk_tech_docs.gemspec').version" )
+          echo "name=gem_version::${gem_version}" >> ${GITHUB_OUTPUT}
 
-          if git fetch origin "refs/tags/v$gem_version" >/dev/null 2>&1
+          if git fetch origin "refs/tags/v${gem_version}" >/dev/null 2>&1
           then
-            echo "Tag 'v$gem_version' already exists"
-            echo "::set-output name=new_version::false"
+            echo "Tag 'v${gem_version}' already exists"
+            echo "name=new_version::false" >> ${GITHUB_OUTPUT}
           else
-            echo "::set-output name=new_version::true"
+            echo "name=new_version::true" ${GITHUB_OUTPUT}
           fi
 
   deploy:
@@ -39,14 +39,15 @@ jobs:
     environment: rubygems
     permissions:
       contents: write  # needed to be able to tag the release
+      packages: write  # needed to be able to publish the gem
     runs-on: ubuntu-latest
     needs: pre
     if: ${{ needs.pre.outputs.go == 'true' }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           cache: 'npm'
           node-version: '14'
@@ -56,21 +57,6 @@ jobs:
           bundler-cache: true
 
       - name: Publish
-        env:
-          RUBYGEMS_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
-        run: |
-          mkdir -p ~/.gem
-
-          cat << EOF > ~/.gem/credentials
-          ---
-          :rubygems_api_key: ${RUBYGEMS_API_KEY}
-          EOF
-
-          chmod 0600 ~/.gem/credentials
-
-          # tag will be associated with github-actions bot user, see
-          # https://github.community/t/github-actions-bot-email-address/17204
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          bundle exec rake release
+        uses: dawidd6/action-publish-gem@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
