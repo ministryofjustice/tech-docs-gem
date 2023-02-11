@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 3.3.1
+
+If your tech-docs live in a directory within a repo (such as `docs`), you can add the following to `config/tech-docs.yml`
+
+```yaml
+repo_directory: docs
+```
+
 ## 3.3.0
 
 ### New features
