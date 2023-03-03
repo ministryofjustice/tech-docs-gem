@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 3.3.2
+
+Added `lib/source/images/govuk-large.png` from `https://github.com/alphagov/govuk-frontend/blob/main/src/govuk/assets/images/govuk-opengraph-image.png`
+
 ## 3.3.1
 
 If your tech-docs live in a directory within a repo (such as `docs`), you can add the following to `config/tech-docs.yml`
