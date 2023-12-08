@@ -2,11 +2,31 @@
 
 ## Unreleased
 
+## 3.4.0
+
+### New features
+
+- Footer and header links now work with relative links. Thanks to [@eddgrant](https://github.com/eddgrant) for contributing this feature.
+
+  See [pull request #325: Support sites deployed on a path other than "/" when generating header and footer links](https://github.com/alphagov/tech-docs-gem/pull/325) for more details.
+
+### Fixes
+
+- You no longer need to downgrade Haml yourself, `bundle install` will now make sure Haml 6 is not installed (see issue [#318: Error: Filters is not a module](https://github.com/alphagov/tech-docs/gem/issues/318)).
+
 ## 3.3.2
 
+_from ministryofjustice_
 Added `lib/source/images/govuk-large.png` from `https://github.com/alphagov/govuk-frontend/blob/main/src/govuk/assets/images/govuk-opengraph-image.png`
 
 ## 3.3.1
+
+_from alphagov_
+This change solves a potential security issue with HTML snippets. Pages indexed in search results have their entire contents indexed, including any HTML code snippets. These HTML snippets would appear in the search results unsanitised, making it possible to render arbitrary HTML or run arbitrary scripts.
+
+You can see more detail about this issue at [#323: Fix XSS vulnerability on search results page](https://github.com/alphagov/tech-docs-gem/pull/323)
+
+_from ministryofjustice_
 
 If your tech-docs live in a directory within a repo (such as `docs`), you can add the following to `config/tech-docs.yml`
 
